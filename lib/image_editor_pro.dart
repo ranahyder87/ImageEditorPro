@@ -42,8 +42,9 @@ class ImageEditorPro extends StatefulWidget {
   final Color bottomBarColor;
   final Directory pathSave;
   final double pixelRatio;
+  final File image;
   ImageEditorPro(
-      {this.appBarColor, this.bottomBarColor, this.pathSave, this.pixelRatio});
+      {this.appBarColor, this.bottomBarColor, this.pathSave, this.pixelRatio, this.image});
 
   @override
   _ImageEditorProState createState() => _ImageEditorProState();
@@ -104,7 +105,9 @@ class _ImageEditorProState extends State<ImageEditorPro> {
     offsets.clear();
     //  multiwidget.clear();
     howmuchwidgetis = 0;
-
+    setState(() {
+      _image = widget.image;
+    });
     super.initState();
   }
 
@@ -245,83 +248,37 @@ class _ImageEditorProState extends State<ImageEditorPro> {
         ),
       ),
     ).xCenter().xScaffold(
-        backgroundColor: Colors.grey.shade400,
+        // backgroundColor: //Colors.grey.shade400,
         key: scaf,
         appBar: AppBar(
           actions: <Widget>[
-            Icon(FontAwesomeIcons.boxes).xIconButton(onPressed: () {
-              showCupertinoDialog(
-                  context: context,
-                  builder: (context) {
-                    return AlertDialog(
-                      title: 'Select Height Width'.text(),
-                      actions: <Widget>[
-                        () {
-                          setState(() {
-                            height = int.parse(heightcontroler.text);
-                            width = int.parse(widthcontroler.text);
-                          });
-                          heightcontroler.clear();
-                          widthcontroler.clear();
-                          Navigator.pop(context);
-                        }.xFlatButton(child: 'Done'.text()),
-                      ],
-                      content: SingleChildScrollView(
-                        child: xColumnSS.list(
-                          [
-                            'Define Height'.text(),
-                            10.0.sizedHeight(),
-                            TextField(
-                                controller: heightcontroler,
-                                keyboardType: TextInputType.numberWithOptions(),
-                                decoration: InputDecoration(
-                                    hintText: 'Height',
-                                    contentPadding: EdgeInsets.only(left: 10),
-                                    border: OutlineInputBorder())),
-                            10.0.sizedHeight(),
-                            'Define Width'.text(),
-                            10.0.sizedHeight(),
-                            TextField(
-                                controller: widthcontroler,
-                                keyboardType: TextInputType.numberWithOptions(),
-                                decoration: InputDecoration(
-                                    hintText: 'Width',
-                                    contentPadding: EdgeInsets.only(left: 10),
-                                    border: OutlineInputBorder())),
-                          ],
-                        ),
-                      ),
-                    );
-                  });
-            }),
+
             Icon(Icons.clear).xIconButton(onPressed: () {
               _controller.points.clear();
               setState(() {});
             }),
-            Icon(Icons.camera_alt).xIconButton(onPressed: () {
-              bottomsheets();
+            // Icon(Icons.camera_alt).xIconButton(onPressed: () {
+            //   bottomsheets();
+            // }),
+            Icon(Icons.done).xIconButton(onPressed: () {
+              screenshotController
+                  .capture(pixelRatio: widget.pixelRatio ?? 1.5)
+                  .then((binaryIntList) async {
+                //print("Capture Done");
+
+                final paths =
+                    widget.pathSave ?? await getTemporaryDirectory();
+
+                final file = await File('${paths.path}/' +
+                    DateTime.now().toString() +
+                    '.jpg')
+                    .create();
+                file.writeAsBytesSync(binaryIntList);
+                Navigator.pop(context, file);
+              }).catchError((onError) {
+                print(onError);
+              });
             }),
-            'Save'.text().xFlatButton(
-                primary: Colors.white,
-                onPressed: () {
-                  screenshotController
-                      .capture(pixelRatio: widget.pixelRatio ?? 1.5)
-                      .then((binaryIntList) async {
-                    //print("Capture Done");
-
-                    final paths =
-                        widget.pathSave ?? await getTemporaryDirectory();
-
-                    final file = await File('${paths.path}/' +
-                            DateTime.now().toString() +
-                            '.jpg')
-                        .create();
-                    file.writeAsBytesSync(binaryIntList);
-                    Navigator.pop(context, file);
-                  }).catchError((onError) {
-                    print(onError);
-                  });
-                })
           ],
           brightness: Brightness.dark,
           // backgroundColor: Colors.red,
@@ -543,110 +500,6 @@ class _ImageEditorProState extends State<ImageEditorPro> {
                       howmuchwidgetis = 0;
                     },
                     title: 'Eraser',
-                  ),
-                  BottomBarContainer(
-                    colors: widget.bottomBarColor,
-                    icons: Icons.photo,
-                    ontap: () {
-                      showModalBottomSheet(
-                          shape: BorderRadius.only(
-                                  topRight: Radius.circular(10),
-                                  topLeft: Radius.circular(10))
-                              .xShapeBorder(),
-                          context: context,
-                          builder: (context) {
-                            return StatefulBuilder(
-                              builder: (context, setS) {
-                                return xColumnCC.list([
-                                  5.0.sizedHeight(),
-                                  'Slider Hue'.xTextColorWhite(),
-                                  10.0.sizedHeight(),
-                                  xRow.list([
-                                    Slider(
-                                        activeColor: Colors.white,
-                                        inactiveColor: Colors.grey,
-                                        value: hueValue,
-                                        min: -10.0,
-                                        max: 10.0,
-                                        onChanged: (v) {
-                                          setS(() {
-                                            setState(() {
-                                              hueValue = v;
-                                            });
-                                          });
-                                        }).xExpanded(),
-                                    'Reset'.xTextColorWhite().xFlatButton(
-                                        onPressed: () {
-                                      setS(() {
-                                        setState(() {
-                                          blurValue = 0.0;
-                                        });
-                                      });
-                                    })
-                                  ]),
-                                  5.0.sizedHeight(),
-                                  'Slider Saturation'.xTextColorWhite(),
-                                  10.0.sizedHeight(),
-                                  xRow.list([
-                                    Slider(
-                                        activeColor: Colors.white,
-                                        inactiveColor: Colors.grey,
-                                        value: saturationValue,
-                                        min: -10.0,
-                                        max: 10.0,
-                                        onChanged: (v) {
-                                          setS(() {
-                                            setState(() {
-                                              saturationValue = v;
-                                            });
-                                          });
-                                        }).xExpanded(),
-                                    'Reset'.xTextColorWhite().xFlatButton(
-                                        onPressed: () {
-                                      setS(() {
-                                        setState(() {
-                                          saturationValue = 0.0;
-                                        });
-                                      });
-                                    })
-                                  ]),
-                                  5.0.sizedHeight(),
-                                  'Slider Brightness'.xTextColorWhite(),
-                                  10.0.sizedHeight(),
-                                  xRow.list([
-                                    Slider(
-                                        activeColor: Colors.white,
-                                        inactiveColor: Colors.grey,
-                                        value: brightnessValue,
-                                        min: 0.0,
-                                        max: 1.0,
-                                        onChanged: (v) {
-                                          setS(() {
-                                            setState(() {
-                                              brightnessValue = v;
-                                            });
-                                          });
-                                        }).xExpanded(),
-                                    'Reset'.xTextColorWhite().xFlatButton(
-                                        onPressed: () {
-                                      setS(() {
-                                        setState(() {
-                                          brightnessValue = 0.0;
-                                        });
-                                      });
-                                    })
-                                  ])
-                                ]);
-                              },
-                            ).xContainer(
-                                color: Colors.black87,
-                                height: 300,
-                                borderRadius: BorderRadius.only(
-                                    topRight: Radius.circular(10),
-                                    topLeft: Radius.circular(10)));
-                          });
-                    },
-                    title: 'Filter',
                   ),
                   BottomBarContainer(
                     colors: widget.bottomBarColor,
