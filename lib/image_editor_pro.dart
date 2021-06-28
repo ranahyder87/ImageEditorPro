@@ -40,11 +40,13 @@ SignatureController _controller =
 class ImageEditorPro extends StatefulWidget {
   final Color appBarColor;
   final Color bottomBarColor;
+  final Color iconsColor;
   final Directory pathSave;
   final double pixelRatio;
   final File image;
+  final Widget title;
   ImageEditorPro(
-      {this.appBarColor, this.bottomBarColor, this.pathSave, this.pixelRatio, this.image});
+      {this.appBarColor, this.bottomBarColor, this.pathSave, this.pixelRatio, this.image, this.iconsColor, this.title});
 
   @override
   _ImageEditorProState createState() => _ImageEditorProState();
@@ -240,7 +242,7 @@ class _ImageEditorProState extends State<ImageEditorPro> {
                   )
                 ],
               )).toContainer(
-            margin: EdgeInsets.all(20),
+            // margin: EdgeInsets.all(20),
             color: Colors.white,
             width: width.toDouble(),
             height: height.toDouble(),
@@ -251,16 +253,19 @@ class _ImageEditorProState extends State<ImageEditorPro> {
         // backgroundColor: //Colors.grey.shade400,
         key: scaf,
         appBar: AppBar(
+          title: widget.title,
+          iconTheme: IconThemeData(color: widget.iconsColor),
           actions: <Widget>[
 
             Icon(Icons.clear).xIconButton(onPressed: () {
               _controller.points.clear();
               setState(() {});
             }),
-            // Icon(Icons.camera_alt).xIconButton(onPressed: () {
-            //   bottomsheets();
-            // }),
+            Icon(Icons.camera_alt).xIconButton(onPressed: () {
+              bottomsheets();
+            }),
             Icon(Icons.done).xIconButton(onPressed: () {
+              print('width $width height $height');
               screenshotController
                   .capture(pixelRatio: widget.pixelRatio ?? 1.5)
                   .then((binaryIntList) async {

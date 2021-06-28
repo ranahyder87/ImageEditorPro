@@ -26,6 +26,8 @@ class _HomePageState extends State<HomePage> {
         return ImageEditorPro(
           appBarColor: Colors.blue,
           bottomBarColor: Colors.blue,
+          iconsColor: Colors.white,
+          title: Text('Adjust Photo'),
           pathSave: null,
         );
       })).then((geteditimage) {
